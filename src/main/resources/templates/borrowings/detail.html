@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Chi tiết phiếu')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<main class="container pb-5">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <h1 class="h3 mb-1" th:text="|Phiếu mượn #${borrowing.id}|">Phiếu</h1>
+            <span class="badge" th:classappend="|text-bg-${borrowing.status.badge}|" th:text="${borrowing.status.label}">TT</span>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-pine" th:if="${borrowing.canReturn()}" th:href="@{/borrowings/{id}/return(id=${borrowing.id})}">Trả sách</a>
+            <a class="btn btn-outline-secondary" th:if="${borrowing.hasUnpaidFine()}"
+               th:href="@{/borrowings/{id}/payments/new(id=${borrowing.id})}">Thanh toán phí</a>
+            <form th:if="${borrowing.canCancel()}" th:action="@{/borrowings/{id}/cancel(id=${borrowing.id})}" method="post">
+                <button class="btn btn-outline-danger" type="submit">Hủy phiếu</button>
+            </form>
+        </div>
+    </div>
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+    <div class="row g-3 mb-3">
+        <div class="col-md-4"><div class="card p-3 stat"><div class="text-muted small">Độc giả</div><div class="fw-semibold" th:text="${borrowing.member.fullName}">Tên</div><div th:text="${borrowing.member.memberCode}">Mã</div></div></div>
+        <div class="col-md-4"><div class="card p-3 stat"><div class="text-muted small">Ngày mượn / hạn trả</div><div th:text="|${#temporals.format(borrowing.borrowedDate, 'dd/MM/yyyy')} → ${#temporals.format(borrowing.dueDate, 'dd/MM/yyyy')}|">ngày</div></div></div>
+        <div class="col-md-4"><div class="card p-3 stat"><div class="text-muted small">Ngày trả hết</div><div>
+                    <span th:if="${borrowing.returnedDate != null}" th:text="${#temporals.format(borrowing.returnedDate, 'dd/MM/yyyy')}"></span>
+                    <span th:unless="${borrowing.returnedDate != null}">Chưa trả hết</span>
+                </div></div></div>
+    </div>
+    <div class="row g-3 mb-4">
+        <div class="col-md-3"><div class="card p-3"><div class="text-muted small">Phí phát sinh</div><div class="fs-5" th:text="${@moneyFormat.vnd(borrowing.totalFineAmount)}">0</div></div></div>
+        <div class="col-md-3"><div class="card p-3"><div class="text-muted small">Đã thanh toán</div><div class="fs-5" th:text="${@moneyFormat.vnd(borrowing.paidFineAmount)}">0</div></div></div>
+        <div class="col-md-3"><div class="card p-3"><div class="text-muted small">Được miễn giảm</div><div class="fs-5" th:text="${@moneyFormat.vnd(borrowing.waivedFineAmount)}">0</div></div></div>
+        <div class="col-md-3"><div class="card p-3"><div class="text-muted small">Còn phải thu</div><div class="fs-5" th:text="${@moneyFormat.vnd(borrowing.unpaidFineAmount)}">0</div></div></div>
+    </div>
+
+    <h2 class="h5">Chi tiết sách</h2>
+    <div class="table-wrap p-3 mb-4">
+        <table class="table mb-0">
+            <thead>
+            <tr><th>Sách</th><th>Mượn</th><th>Đã trả</th><th>Còn</th><th>Ngày trả gần nhất</th><th>Ngày trễ tính phí</th><th class="text-end">Phí dòng</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="detail : ${borrowing.details}">
+                <td>
+                    <div th:text="${detail.book.title}">Sách</div>
+                    <div class="text-muted small" th:text="${detail.book.author}">Tác giả</div>
+                </td>
+                <td th:text="${detail.quantity}">1</td>
+                <td th:text="${detail.returnedQuantity}">0</td>
+                <td th:text="${detail.remainingQuantity}">1</td>
+                <td>
+                    <span th:if="${detail.lastReturnedDate != null}" th:text="${#temporals.format(detail.lastReturnedDate, 'dd/MM/yyyy')}"></span>
+                    <span th:unless="${detail.lastReturnedDate != null}">—</span>
+                </td>
+                <td th:text="${detail.lateDays}">0</td>
+                <td class="text-end" th:text="${@moneyFormat.vnd(detail.fineAmount)}">0</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <h2 class="h5">Lịch sử thanh toán</h2>
+            <div class="table-wrap p-3">
+                <table class="table mb-0">
+                    <thead><tr><th>Ngày</th><th>Hình thức</th><th>Ghi chú</th><th class="text-end">Số tiền</th></tr></thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(borrowing.payments)}"><td colspan="4" class="text-muted">Chưa có thanh toán.</td></tr>
+                    <tr th:each="payment : ${borrowing.payments}">
+                        <td th:text="${#temporals.format(payment.paymentDate, 'dd/MM/yyyy')}">ngày</td>
+                        <td th:text="${payment.method}">Tiền mặt</td>
+                        <td th:text="${payment.note != null and !payment.note.isBlank() ? payment.note : '—'}">—</td>
+                        <td class="text-end" th:text="${@moneyFormat.vnd(payment.amount)}">0</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <h2 class="h5">Miễn giảm phí</h2>
+            <div class="table-wrap p-3 mb-3">
+                <table class="table mb-0">
+                    <thead><tr><th>Ngày</th><th>Người duyệt</th><th>Lý do</th><th class="text-end">Số tiền</th></tr></thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(borrowing.waivers)}"><td colspan="4" class="text-muted">Chưa có miễn giảm.</td></tr>
+                    <tr th:each="waiver : ${borrowing.waivers}">
+                        <td th:text="${#temporals.format(waiver.approvedDate, 'dd/MM/yyyy')}">ngày</td>
+                        <td th:text="${waiver.approvedBy}">Người</td>
+                        <td th:text="${waiver.reason}">Lý do</td>
+                        <td class="text-end" th:text="${@moneyFormat.vnd(waiver.amount)}">0</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <form class="card p-3" th:if="${borrowing.hasUnpaidFine()}" th:action="@{/borrowings/{id}/waivers(id=${borrowing.id})}" th:object="${waiverForm}" method="post">
+                <h3 class="h6">Ghi nhận miễn giảm</h3>
+                <div class="mb-2">
+                    <input class="form-control" type="number" min="1" step="1" placeholder="Số tiền" th:field="*{amount}">
+                </div>
+                <div class="mb-2">
+                    <input class="form-control" placeholder="Lý do" th:field="*{reason}">
+                </div>
+                <div class="mb-2">
+                    <input class="form-control" placeholder="Người duyệt" th:field="*{approvedBy}">
+                </div>
+                <button class="btn btn-outline-secondary" type="submit">Miễn giảm</button>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>

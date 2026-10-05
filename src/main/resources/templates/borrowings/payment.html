@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Thanh toán phí')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<main class="container pb-5 col-lg-7">
+    <h1 class="h3" th:text="|Thanh toán phí — phiếu #${borrowing.id}|">Thanh toán</h1>
+    <p>Còn phải thu: <strong th:text="${@moneyFormat.vnd(borrowing.unpaidFineAmount)}">0</strong></p>
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+    <form class="card p-4" th:action="@{/borrowings/{id}/payments(id=${borrowing.id})}" th:object="${form}" method="post"
+          th:if="${borrowing.hasUnpaidFine()}">
+        <div class="mb-3">
+            <label class="form-label">Số tiền</label>
+            <input class="form-control" type="number" min="1" step="1" th:field="*{amount}">
+            <div class="text-danger small" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Hình thức</label>
+            <select class="form-select" th:field="*{method}">
+                <option value="Tiền mặt">Tiền mặt</option>
+                <option value="Chuyển khoản">Chuyển khoản</option>
+                <option value="Thẻ">Thẻ</option>
+            </select>
+            <div class="text-danger small" th:if="${#fields.hasErrors('method')}" th:errors="*{method}"></div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Ngày thanh toán</label>
+            <input class="form-control" type="date" th:field="*{paymentDate}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Ghi chú</label>
+            <input class="form-control" th:field="*{note}">
+        </div>
+        <button class="btn btn-pine" type="submit">Ghi nhận</button>
+        <a class="btn btn-link" th:href="@{/borrowings/{id}(id=${borrowing.id})}">Quay lại</a>
+    </form>
+    <div class="alert alert-success" th:unless="${borrowing.hasUnpaidFine()}">Phiếu này không còn phí phải thu.</div>
+</main>
+</body>
+</html>

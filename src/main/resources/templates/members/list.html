@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Độc giả')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<main class="container pb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Độc giả</h1>
+        <a class="btn btn-pine" th:href="@{/members/new}">Thêm độc giả</a>
+    </div>
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+    <div class="table-wrap p-3">
+        <table class="table align-middle mb-0">
+            <thead>
+            <tr><th>Mã</th><th>Họ tên</th><th>Email</th><th>Điện thoại</th></tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(members)}"><td colspan="4" class="text-muted">Chưa có độc giả.</td></tr>
+            <tr th:each="member : ${members}">
+                <td th:text="${member.memberCode}">M001</td>
+                <td th:text="${member.fullName}">Tên</td>
+                <td th:text="${member.email}">email</td>
+                <td th:text="${member.phone}">phone</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

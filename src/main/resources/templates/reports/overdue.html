@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Báo cáo quá hạn')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<main class="container pb-5">
+    <h1 class="h3">Báo cáo quá hạn</h1>
+    <p class="text-muted">Phí dự kiến tính trên số sách còn chưa trả, theo chính sách đang áp dụng, và chưa ghi vào phiếu cho đến khi trả sách.</p>
+    <div class="table-wrap p-3">
+        <table class="table align-middle mb-0">
+            <thead>
+            <tr>
+                <th>Phiếu</th>
+                <th>Độc giả</th>
+                <th>Hạn trả</th>
+                <th>Ngày trễ</th>
+                <th>Sách chưa trả</th>
+                <th class="text-end">Phí dự kiến</th>
+                <th class="text-end">Nợ phí đã chốt</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(rows)}"><td colspan="7" class="text-muted">Không có phiếu quá hạn.</td></tr>
+            <tr th:each="row : ${rows}">
+                <td><a th:href="@{/borrowings/{id}(id=${row.borrowingId})}" th:text="${row.borrowingId}">1</a></td>
+                <td>
+                    <div th:text="${row.memberName}">Tên</div>
+                    <div class="text-muted small" th:text="${row.memberCode}">Mã</div>
+                </td>
+                <td th:text="${#temporals.format(row.dueDate, 'dd/MM/yyyy')}">hạn</td>
+                <td th:text="${row.lateDays}">0</td>
+                <td th:text="${row.unreturnedCopies}">0</td>
+                <td class="text-end" th:text="${@moneyFormat.vnd(row.estimatedFine)}">0</td>
+                <td class="text-end" th:text="${@moneyFormat.vnd(row.unpaidFine)}">0</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Chính sách phí')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<main class="container pb-5">
+    <h1 class="h3">Chính sách phí phạt</h1>
+    <p class="text-muted">Chỉ một chính sách được dùng tại một thời điểm. Phiếu đã trả giữ nguyên số phí đã chốt lúc trả.</p>
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <form class="card p-4" th:action="@{/fine-policies}" th:object="${form}" method="post">
+                <h2 class="h5">Áp dụng mức mới</h2>
+                <div class="mb-3">
+                    <label class="form-label">Phí mỗi ngày (đ)</label>
+                    <input class="form-control" type="number" min="1" step="1" th:field="*{dailyFineAmount}">
+                    <div class="text-danger small" th:if="${#fields.hasErrors('dailyFineAmount')}" th:errors="*{dailyFineAmount}"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Ngày ân hạn</label>
+                    <input class="form-control" type="number" min="0" th:field="*{graceDays}">
+                    <div class="text-danger small" th:if="${#fields.hasErrors('graceDays')}" th:errors="*{graceDays}"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Trần phí mỗi dòng (để trống nếu không giới hạn)</label>
+                    <input class="form-control" type="number" min="0" step="1" th:field="*{maxFineAmount}">
+                    <div class="text-danger small" th:if="${#fields.hasErrors('maxFineAmount')}" th:errors="*{maxFineAmount}"></div>
+                </div>
+                <button class="btn btn-pine" type="submit">Áp dụng</button>
+            </form>
+        </div>
+        <div class="col-lg-7">
+            <div class="table-wrap p-3">
+                <table class="table mb-0">
+                    <thead>
+                    <tr><th>Ngày tạo</th><th>Phí/ngày</th><th>Ân hạn</th><th>Trần</th><th>Trạng thái</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(policies)}"><td colspan="5" class="text-muted">Chưa có chính sách.</td></tr>
+                    <tr th:each="policy : ${policies}">
+                        <td th:text="${#temporals.format(policy.createdAt, 'dd/MM/yyyy')}">ngày</td>
+                        <td th:text="${@moneyFormat.vnd(policy.dailyFineAmount)}">0</td>
+                        <td th:text="${policy.graceDays}">0</td>
+                        <td>
+                            <span th:if="${policy.maxFineAmount != null}" th:text="${@moneyFormat.vnd(policy.maxFineAmount)}">0</span>
+                            <span th:unless="${policy.maxFineAmount != null}">Không</span>
+                        </td>
+                        <td>
+                            <span class="badge text-bg-success" th:if="${policy.active}">Đang dùng</span>
+                            <span class="badge text-bg-secondary" th:unless="${policy.active}">Đã thay</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

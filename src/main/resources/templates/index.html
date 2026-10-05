@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Trang chủ')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<main class="container pb-5">
+    <div class="row g-4 align-items-center mb-4">
+        <div class="col-lg-7">
+            <h1 class="display-6">Mượn trả sách và phí phạt trả muộn</h1>
+            <p class="lead">Mỗi phiếu mượn, lần trả sách và lần thanh toán phí chạy trong một transaction. Tồn kho không bị trừ một phần khi phiếu lỗi, và phí phạt được tính theo chính sách đang áp dụng.</p>
+        </div>
+        <div class="col-lg-5">
+            <div class="card p-4">
+                <h2 class="h5">Quy tắc đang dùng</h2>
+                <ul class="mb-0">
+                    <li>Tối đa 5 cuốn chưa trả cho một độc giả.</li>
+                    <li>Còn phiếu quá hạn hoặc còn nợ phí thì không tạo phiếu mới.</li>
+                    <li>Phí = số ngày trễ sau ân hạn × số lượng trả lần này × phí mỗi ngày.</li>
+                    <li>Trả từng phần chỉ tính phí trên số lượng vừa trả.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="row g-3">
+        <div class="col-md-4"><a class="card p-3 text-decoration-none text-dark h-100" th:href="@{/books}"><h2 class="h5">Sách</h2><p class="mb-0">Tìm kiếm, phân trang và xem số bản còn cho mượn.</p></a></div>
+        <div class="col-md-4"><a class="card p-3 text-decoration-none text-dark h-100" th:href="@{/borrowings/new}"><h2 class="h5">Mượn sách</h2><p class="mb-0">Chọn độc giả, nhiều đầu sách, số lượng và hạn trả.</p></a></div>
+        <div class="col-md-4"><a class="card p-3 text-decoration-none text-dark h-100" th:href="@{/reports/overdue}"><h2 class="h5">Báo cáo quá hạn</h2><p class="mb-0">Độc giả quá hạn, số ngày trễ và phí dự kiến.</p></a></div>
+    </div>
+</main>
+</body>
+</html>

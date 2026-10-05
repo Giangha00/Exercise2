@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Thêm độc giả')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<main class="container pb-5 col-lg-7">
+    <h1 class="h3">Thêm độc giả</h1>
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+    <form class="card p-4" th:action="@{/members}" th:object="${form}" method="post">
+        <div class="mb-3">
+            <label class="form-label">Mã độc giả</label>
+            <input class="form-control" th:field="*{memberCode}">
+            <div class="text-danger small" th:if="${#fields.hasErrors('memberCode')}" th:errors="*{memberCode}"></div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Họ tên</label>
+            <input class="form-control" th:field="*{fullName}">
+            <div class="text-danger small" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input class="form-control" type="email" th:field="*{email}">
+            <div class="text-danger small" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Số điện thoại</label>
+            <input class="form-control" th:field="*{phone}">
+            <div class="text-danger small" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+        </div>
+        <button class="btn btn-pine" type="submit">Lưu</button>
+        <a class="btn btn-link" th:href="@{/members}">Quay lại</a>
+    </form>
+</main>
+</body>
+</html>

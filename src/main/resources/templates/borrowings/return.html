@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Trả sách')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: nav}"></div>
+<main class="container pb-5">
+    <h1 class="h3" th:text="|Trả sách — phiếu #${borrowing.id}|">Trả sách</h1>
+    <p class="text-muted" th:if="${policy != null}"
+       th:text="|Phí = max(0, ngày trả − hạn trả − ${policy.graceDays} ngày ân hạn) × số lượng trả lần này × ${@moneyFormat.vnd(policy.dailyFineAmount)}.|">
+        Công thức
+    </p>
+    <div th:replace="~{fragments/layout :: alerts}"></div>
+    <form class="card p-4" th:action="@{/borrowings/{id}/return(id=${borrowing.id})}" th:object="${form}" method="post">
+        <div class="mb-3 col-md-4">
+            <label class="form-label">Ngày trả</label>
+            <input class="form-control" type="date" th:field="*{returnDate}">
+        </div>
+        <table class="table">
+            <thead>
+            <tr><th>Sách</th><th>Đang mượn</th><th>Số lượng trả lần này</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="line, stat : *{lines}">
+                <td>
+                    <input type="hidden" th:field="*{lines[__${stat.index}__].detailId}">
+                    <span th:text="${detailById.get(line.detailId).book.title}">Sách</span>
+                </td>
+                <td th:text="${detailById.get(line.detailId).remainingQuantity}">1</td>
+                <td style="max-width: 160px">
+                    <input class="form-control" type="number" min="0"
+                           th:max="${detailById.get(line.detailId).remainingQuantity}"
+                           th:field="*{lines[__${stat.index}__].quantity}">
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(form.lines)}"><td colspan="3">Phiếu này không còn sách để trả.</td></tr>
+            </tbody>
+        </table>
+        <button class="btn btn-outline-secondary" type="submit" name="intent" value="preview">Xem phí phát sinh</button>
+        <button class="btn btn-pine" type="submit" name="intent" value="confirm">Xác nhận trả</button>
+        <a class="btn btn-link" th:href="@{/borrowings/{id}(id=${borrowing.id})}">Quay lại</a>
+    </form>
+
+    <div class="card p-4 mt-3" th:if="${preview != null}">
+        <h2 class="h5">Phí phát sinh nếu xác nhận</h2>
+        <table class="table">
+            <thead><tr><th>Sách</th><th>Số lượng</th><th>Ngày trễ tính phí</th><th class="text-end">Phí lần này</th></tr></thead>
+            <tbody>
+            <tr th:each="line : ${preview.lines}">
+                <td th:text="${line.bookTitle}">Sách</td>
+                <td th:text="${line.quantity}">1</td>
+                <td th:text="${line.lateDays}">0</td>
+                <td class="text-end" th:text="${@moneyFormat.vnd(line.fine)}">0</td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="fw-semibold" th:text="|Tổng phí lần này: ${@moneyFormat.vnd(preview.totalFine)}|">Tổng</div>
+    </div>
+</main>
+</body>
+</html>

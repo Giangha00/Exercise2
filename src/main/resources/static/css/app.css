@@ -1,0 +1,72 @@
+:root {
+    --ink: #1c1915;
+    --paper: #f6f1e7;
+    --card: #fffdf8;
+    --line: #e4d8c4;
+    --pine: #1f4d3a;
+    --pine-dark: #143528;
+    --clay: #9a4a2a;
+    --gold: #c4a15a;
+}
+
+body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Source Sans 3", "Segoe UI", sans-serif;
+}
+
+h1, h2, h3, .navbar-brand {
+    font-family: "Fraunces", Georgia, serif;
+}
+
+.navbar {
+    background: var(--pine-dark);
+}
+
+.navbar .nav-link,
+.navbar .navbar-brand {
+    color: #f6f1e7;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+    color: #fff;
+}
+
+.navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+.navbar-toggler-icon {
+    filter: invert(1);
+}
+
+.card,
+.table-wrap {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+}
+
+.btn-pine {
+    background: var(--pine);
+    border-color: var(--pine);
+    color: #fff;
+}
+
+.btn-pine:hover {
+    background: var(--pine-dark);
+    color: #fff;
+}
+
+.stat {
+    border-left: 4px solid var(--gold);
+}
+
+.table > :not(caption) > * > * {
+    background: transparent;
+}
+
+.badge-soft {
+    font-weight: 600;
+}
